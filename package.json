@@ -1,0 +1,13 @@
+{
+  "name": "ds-electrical-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "D.S. Electrical website with Supabase products, owner dashboard, customer enquiries and server-side Resend notifications.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/test.js",
+    "preview": "python3 -m http.server 8000"
+  }
+}

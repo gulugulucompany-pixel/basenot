@@ -1,0 +1,527 @@
+/* ==========================================================================
+   D.S. Electrical: supplemental premium styling
+   --------------------------------------------------------------------------
+   ADDITIVE ONLY. The original styles in index.html are untouched. This file is
+   loaded AFTER them and refines the look by:
+     1. re-pointing the existing design tokens (--ink, --paper, --accent ...)
+        to a blue palette, so every existing component picks them up, and
+     2. adding small, targeted refinements on the existing class names.
+   Delete the <link> to this file in index.html to return to the original look.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400;500;600;700&display=swap");
+
+/* ---- 1. Design tokens (same names as the original, new values) ---------- */
+:root {
+  /* palette */
+  --midnight: #0a1a36;   /* midnight navy */
+  --cobalt:   #0b3f9e;   /* cobalt blue   */
+  --royal:    #1a56c8;   /* royal blue    */
+  --electric: #2f7bff;   /* electric blue */
+  --steel:    #5b7699;   /* steel blue    */
+  --ice:      #eef4fc;   /* pale ice blue */
+  --sky:      #d3e4fb;   /* soft sky blue */
+  --cool:     #f4f7fb;   /* cool grey     */
+  --charcoal: #1c2533;
+
+  /* existing tokens, remapped */
+  --ink: var(--midnight);
+  --ink2: #4b5b73;
+  --paper: var(--cool);
+  --line: #d7e0ed;
+  --accent: var(--royal);
+  --accent-d: var(--cobalt);
+  --r: 20px;
+
+  /* system-font stacks: San Francisco on Apple devices, no downloads */
+  --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* new helper tokens */
+  --shadow-1: 0 1px 2px rgba(10, 26, 54, .05), 0 1px 1px rgba(10, 26, 54, .03);
+  --shadow-2: 0 14px 34px -14px rgba(11, 63, 158, .28), 0 2px 6px rgba(10, 26, 54, .06);
+  --ring: 0 0 0 4px rgba(47, 123, 255, .2);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+/* ---- 2. Typography ------------------------------------------------------ */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { font-weight: 700; }
+h1 { font-size: clamp(2.5rem, 7vw, 4.75rem); line-height: 1.03; letter-spacing: -.04em; max-width: 20ch; }
+h2 { letter-spacing: -.03em; line-height: 1.08; }
+h3 { font-weight: 600; letter-spacing: -.015em; line-height: 1.25; }
+.hero .lead { font-size: clamp(1.1rem, 2.4vw, 1.35rem); line-height: 1.5; }
+.head p, .lead { line-height: 1.55; }
+.kicker { font-size: .75rem; letter-spacing: .12em; }
+::selection { background: var(--sky); color: var(--midnight); }
+
+/* ---- 3. Focus (keyboard accessibility) ---------------------------------- */
+:focus-visible { outline-color: var(--electric); outline-offset: 3px; }
+
+/* ---- 4. Navigation ------------------------------------------------------ */
+.nav {
+  background: rgba(255, 255, 255, .72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-color: rgba(215, 224, 237, .9);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 10px 30px -12px rgba(10, 26, 54, .18);
+}
+.brand { font-weight: 700; letter-spacing: -.02em; }
+.links a { color: var(--ink2); transition: background .2s var(--ease), color .2s var(--ease); }
+.links a:hover { background: var(--ice); color: var(--ink); }
+/* the phone button inside the nav keeps its blue fill on hover (the generic link hover would otherwise wash it out) */
+.links a.btn-p { color: #fff; }
+.links a.btn-p:hover { background: var(--accent-d); color: #fff; }
+@media (max-width: 900px) {
+  .links {
+    background: rgba(255, 255, 255, .97);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 18px 40px -16px rgba(10, 26, 54, .28);
+  }
+  .links a { color: var(--ink); }
+}
+
+/* ---- 5. Buttons --------------------------------------------------------- */
+.btn {
+  font-weight: 600;
+  letter-spacing: -.005em;
+  transition: transform .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease);
+}
+.btn:active { transform: translateY(0) scale(.98); }
+.btn-p {
+  box-shadow: 0 1px 2px rgba(11, 63, 158, .3), inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+.btn-p:hover { box-shadow: 0 8px 20px -8px rgba(11, 63, 158, .55), inset 0 1px 0 rgba(255, 255, 255, .14); }
+/* secondary buttons: tinted outline instead of a heavy black one */
+.btn:not(.btn-p):not(.menu) {
+  border-color: rgba(26, 86, 200, .35);
+  color: var(--cobalt);
+}
+.btn:not(.btn-p):not(.menu):hover { background: var(--ice); border-color: var(--royal); }
+.menu { border-color: var(--line); color: var(--ink); }
+/* buttons on the dark summary panel keep the original white outline treatment */
+.result .btn:not(.btn-p) { border-color: rgba(255, 255, 255, .55); color: #fff; }
+.result .btn:not(.btn-p):hover { background: rgba(255, 255, 255, .1); border-color: #fff; }
+.result .btn-p { background: var(--electric); border-color: var(--electric); }
+.result .btn-p:hover { background: #4f90ff; border-color: #4f90ff; }
+.btn[disabled], .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---- 6. Hero ------------------------------------------------------------ */
+.hero { gap: var(--s3); }
+.actions { margin-top: var(--s2); }
+
+/* Intentional empty image area (shown only while no company photo has been uploaded) */
+.hero-visual {
+  width: 100%;
+  aspect-ratio: 21 / 8;
+  min-height: 200px;
+  border-radius: calc(var(--r) + 4px);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .08);
+  background:
+    radial-gradient(120% 140% at 85% 0%, rgba(47, 123, 255, .5) 0%, rgba(47, 123, 255, 0) 55%),
+    radial-gradient(90% 120% at 0% 100%, rgba(26, 86, 200, .45) 0%, rgba(26, 86, 200, 0) 60%),
+    var(--midnight);
+  box-shadow: var(--shadow-2);
+}
+.hero-visual::before {            /* faint blueprint grid */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 85%);
+}
+.hero-visual[hidden] { display: none; }
+@media (max-width: 680px) { .hero-visual { aspect-ratio: 16 / 10; } }
+
+#heroPhoto img { box-shadow: var(--shadow-2); }
+
+/* ---- 7. Cards, grids ---------------------------------------------------- */
+.card {
+  border-color: var(--line);
+  box-shadow: var(--shadow-1);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+}
+.card:hover { transform: translateY(-2px); border-color: var(--sky); box-shadow: var(--shadow-2); }
+.num { font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.card p { line-height: 1.55; }
+
+/* Services: nine items laid out 3 x 3 instead of an orphaned last row */
+#services .grid { grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 600px) { #services .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 940px) { #services .grid { grid-template-columns: repeat(3, 1fr); } }
+#services .card { padding: 1.6rem; gap: .6rem; }
+#services .num {
+  font-size: .8rem;
+  letter-spacing: .1em;
+  color: var(--steel);
+}
+#services .card:hover .num { color: var(--royal); }
+#services .card h3 { font-size: 1.25rem; }
+
+/* ---- 8. Enquiry wizard -------------------------------------------------- */
+.stepper { border-bottom-color: var(--line); }
+.step-node.active strong { box-shadow: var(--ring); }
+.pick button {
+  border-color: var(--line);
+  transition: background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.pick button:hover { border-color: var(--royal); color: var(--cobalt); background: var(--ice); }
+.pick button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px -8px rgba(11, 63, 158, .6);
+}
+.input-field, .product-form input, .product-form textarea, .product-form select {
+  border-color: var(--line);
+  border-radius: 12px;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.input-field:focus, .product-form input:focus, .product-form textarea:focus, .product-form select:focus {
+  outline: none;
+  border-color: var(--electric);
+  box-shadow: var(--ring);
+}
+.result {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(255, 255, 255, .06);
+  box-shadow: 0 24px 50px -24px rgba(10, 26, 54, .6);
+}
+.result dt { color: rgba(255, 255, 255, .68); }
+.badge-accent { background: rgba(26, 86, 200, .08); }
+.feedback-note.warn { color: var(--cobalt); }
+
+/* ---- 9. Products (including a premium empty state) ---------------------- */
+.product-card {
+  border-color: var(--line);
+  box-shadow: var(--shadow-1);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease);
+}
+.product-card:hover { transform: translateY(-2px); border-color: var(--sky); box-shadow: var(--shadow-2); }
+.product-image-placeholder { background: var(--ice); color: var(--steel); }
+.product-card img { background: var(--ice); }
+#productGrid > p.lead {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: clamp(2rem, 6vw, 3.5rem) 1.5rem;
+  border: 1px dashed #b4c9e8;
+  border-radius: var(--r);
+  background: rgba(255, 255, 255, .6);
+  color: var(--ink2);
+  font-size: 1rem;
+}
+
+/* ---- 10. Gallery, FAQ, lists, contact ----------------------------------- */
+.gal { scrollbar-width: thin; scrollbar-color: var(--sky) transparent; }
+.gal figure { border-color: var(--line); box-shadow: var(--shadow-1); }
+.areas li { border-color: var(--line); background: #fff; }
+
+details {
+  border-radius: 16px;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+details:hover { border-color: var(--sky); }
+details[open] { border-color: var(--sky); box-shadow: var(--shadow-1); }
+summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after {                      /* chevron: the original summary had no visible open/close cue */
+  content: "";
+  flex: 0 0 auto;
+  width: .5rem;
+  height: .5rem;
+  margin-left: 1rem;
+  border-right: 2px solid var(--steel);
+  border-bottom: 2px solid var(--steel);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform .25s var(--ease);
+}
+details[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+
+.big { font-weight: 700; letter-spacing: -.03em; transition: color .2s var(--ease); }
+.big:hover { color: var(--royal); }
+.opening-hours-list div { border-bottom-color: var(--line); }
+
+section + section { border-top-color: var(--line); }
+.foot { border-top-color: var(--line); }
+
+/* ---- 11. Dialog --------------------------------------------------------- */
+dialog {
+  border: 1px solid var(--line);
+  border-radius: calc(var(--r) + 4px);
+  box-shadow: 0 30px 70px -20px rgba(10, 26, 54, .45);
+}
+dialog::backdrop {
+  background: rgba(10, 26, 54, .55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* ---- 12. Small screens -------------------------------------------------- */
+@media (max-width: 480px) {
+  .actions .btn { flex: 1 1 100%; }
+  .card { padding: 1.25rem; }
+  #services .card { padding: 1.25rem; }
+  section { padding-block: 3.5rem; }
+}
+
+/* ---- 13. Reduced motion (extends the original rule) --------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .btn:active, .card:hover, .product-card:hover { transform: none; }
+}
+
+/* ---- 14. Fixes found in visual review ----------------------------------- */
+/* .btn is display:inline-flex, which overrode the [hidden] attribute on buttons (e.g. "Try again", "Check area") */
+[hidden] { display: none !important; }
+
+/* breathing room between the floating nav and the hero text (the original removed hero top padding via #home) */
+#home { padding-top: clamp(2.5rem, 7vw, 5rem); }
+
+/* hero order: text, buttons, then the image area, then any trust cards */
+.hero > .hero-visual, .hero > #heroPhoto { order: 5; }
+.hero > #trustGrid { order: 6; }
+
+@media (max-width: 480px) {
+  .result dl div { flex-wrap: wrap; row-gap: .15rem; }
+  .result dd { flex: 1 1 100%; order: 3; text-align: left; }
+}
+
+/* ==========================================================================
+   15. Polish pass: rhythm, readability, buttons, forms
+   ========================================================================== */
+/* consistent vertical rhythm: a little tighter than the original 5rem, never cramped */
+section { padding-block: clamp(3.5rem, 8vw, 5.5rem); }
+.head { margin-bottom: clamp(1.75rem, 4vw, 2.5rem); gap: .6rem; max-width: 62ch; }
+.head p, .lead, .card p, details p { max-width: 68ch; }
+.card { gap: .55rem; }
+.card h3 + p { margin-top: .1rem; }
+.grid { gap: 1rem; }
+.pane.active { gap: 1rem; }
+.pane h3 { font-size: 1.35rem; }
+.pane > .lead { margin-top: -.5rem; }
+.product-grid { gap: 1rem; }
+.foot { padding-top: clamp(2rem, 5vw, 3rem); }
+
+/* Buttons that feel alive: 160-250 ms transitions, lift, soft light sweep via a pseudo-element, pressed state */
+.btn { position: relative; isolation: isolate; transition-duration: .18s; }
+.btn-p { overflow: hidden; }
+.btn-p::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, 0) 60%);
+  opacity: 0;
+  transition: opacity .2s var(--ease);
+}
+.btn-p:hover::before { opacity: 1; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
+.btn-p:active { box-shadow: 0 1px 2px rgba(11, 63, 158, .4) inset; }
+.btn:focus-visible { outline: 3px solid var(--electric); outline-offset: 3px; }
+.btn[disabled], .btn:disabled { cursor: progress; }
+#btnSend:disabled, #productEnquirySubmit:disabled { cursor: progress; }
+
+/* service cards: clear hierarchy + gentle hover (index number, title, line) */
+#services .card h3 { margin-top: .1rem; }
+#services .card:hover h3 { color: var(--cobalt); }
+#services .card h3, #services .num { transition: color .2s var(--ease); }
+
+/* forms: spacing, focus ring, error and success states */
+.pane label, .product-form label { display: block; margin-bottom: .3rem; }
+.input-field, .product-form input, .product-form textarea, .product-form select { padding: .85rem 1rem; line-height: 1.4; }
+.input-field::placeholder, .product-form ::placeholder { color: #8394ad; }
+.input-field:user-invalid, .product-form input:user-invalid, .product-form textarea:user-invalid { border-color: #b91c1c; box-shadow: 0 0 0 4px rgba(185, 28, 28, .12); }
+.feedback-note, .product-dialog-status { line-height: 1.45; }
+.feedback-note:empty { display: none; }
+#stepContactMsg:not(:empty) { padding: .6rem .85rem; border-radius: 10px; background: #fef2f2; color: #b91c1c; }
+#sendStatus:not(:empty) { padding: .7rem .9rem; border-radius: 10px; background: rgba(255, 255, 255, .1); }
+.product-dialog-status.err:not(:empty) { padding: .6rem .85rem; border-radius: 10px; background: #fef2f2; }
+.product-dialog-status.ok:not(:empty) { padding: .6rem .85rem; border-radius: 10px; background: #ecfdf5; }
+
+/* narrow screens: comfortable tap targets, no sideways scroll */
+@media (max-width: 680px) {
+  .btn, .pick button, .input-field, summary { min-height: 48px; }
+  .pick { gap: .5rem; }
+  .actions .btn, .product-card .btn { width: 100%; }
+  .product-form { min-width: 0; width: 100%; }
+  dialog { max-width: calc(100vw - 2rem); padding: 1.25rem; }
+  .big { font-size: clamp(1.5rem, 8vw, 2rem); }
+}
+html, body { max-width: 100%; }
+img, svg, video { max-width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover, .btn:active { transform: none; }
+}
+
+/* ==========================================================================
+   16. Typography and brand (reference: warm, sturdy humanist serif wordmark)
+   --------------------------------------------------------------------------
+   Display: Fraunces (warm, friendly serif with real character, free on Google
+            Fonts). Body/UI: Inter (clean, highly legible sans).
+   Fallbacks: Iowan Old Style / Charter / Georgia for display; system UI sans
+   for body, so the page stays fully readable if Google Fonts is unreachable.
+   ========================================================================== */
+:root {
+  --serif: "Fraunces", "Iowan Old Style", "Charter", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --gold: #f2b84b;             /* small "live current" accent, used sparingly */
+  --navy-deep: #06122a;
+}
+body { font-feature-settings: "cv11", "ss01"; }
+h1, h2, h3 { font-family: var(--serif); font-optical-sizing: auto; font-weight: 600; }
+h1 { letter-spacing: -.02em; line-height: 1.05; font-weight: 600; }
+h2 { letter-spacing: -.02em; line-height: 1.12; }
+h3 { letter-spacing: -.01em; }
+.kicker {
+  font-family: var(--sans);
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  color: var(--royal);
+}
+.kicker::before {           /* short rule before each eyebrow label */
+  content: "";
+  width: 1.6rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--electric), var(--cobalt));
+}
+
+/* ---- Brand lockup: bolt mark + "D.S. Electrical" ------------------------
+   The brand text is injected by site.js as plain text, so spacing is handled
+   in CSS only: a deliberate word-space after "D.S." and gentle tracking.     */
+.brand {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.28rem;
+  letter-spacing: .005em;
+  word-spacing: .16em;
+  line-height: 1;
+  gap: .6rem;
+  color: var(--midnight);
+  font-variant-ligatures: common-ligatures;
+}
+.brand::before {            /* original lightning-bolt badge, drawn in CSS/SVG */
+  content: "";
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 11px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.35' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8a6.3 6.3 0 0 0-3.7 11.4c.7.5 1.1 1.3 1.1 2.1v.5h5.2v-.5c0-.8.4-1.6 1.1-2.1A6.3 6.3 0 0 0 12 2.8z'/%3E%3Cpath d='M9.6 18.4h4.8M10 20.2h4M10.7 22h2.6'/%3E%3Cpath d='M10.2 12.6 11 10.4c.3-.7 1.3-.7 1.6 0l.4 1c.2.5.9.5 1.1 0l.3-.9M11 10.4V16m2.1-5.6V16'/%3E%3C/svg%3E") center / 76% no-repeat,
+    linear-gradient(145deg, var(--royal), var(--midnight));
+  box-shadow: 0 6px 14px -6px rgba(11, 63, 158, .7), inset 0 1px 0 rgba(255, 255, 255, .22);
+  transition: transform .25s var(--ease);
+}
+.brand:hover::before { transform: rotate(-6deg) scale(1.05); }
+.brand:focus-visible { border-radius: 12px; }
+@media (max-width: 900px) {
+  .brand { white-space: nowrap; font-size: 1.18rem; }
+}
+@media (max-width: 380px) {
+  .brand { font-size: 1.05rem; gap: .45rem; }
+  .brand::before { width: 1.7rem; height: 1.7rem; border-radius: 9px; }
+}
+
+/* ---- Footer: deeper navy band, brand repeated with the same care -------- */
+.foot {
+  background: linear-gradient(180deg, var(--midnight), var(--navy-deep));
+  color: rgba(255, 255, 255, .78);
+  border-top: 0;
+  margin-top: 1rem;
+}
+.foot strong[data-config-name] {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: .005em;
+  word-spacing: .16em;
+  color: #fff;
+}
+.foot strong[data-config-name]::before {
+  content: "";
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 10px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.35' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8a6.3 6.3 0 0 0-3.7 11.4c.7.5 1.1 1.3 1.1 2.1v.5h5.2v-.5c0-.8.4-1.6 1.1-2.1A6.3 6.3 0 0 0 12 2.8z'/%3E%3Cpath d='M9.6 18.4h4.8M10 20.2h4M10.7 22h2.6'/%3E%3Cpath d='M10.2 12.6 11 10.4c.3-.7 1.3-.7 1.6 0l.4 1c.2.5.9.5 1.1 0l.3-.9M11 10.4V16m2.1-5.6V16'/%3E%3C/svg%3E") center / 76% no-repeat,
+    linear-gradient(145deg, var(--electric), var(--cobalt));
+}
+.foot h3 { color: #fff; font-size: 1.1rem; }
+.foot a { color: #fff; }
+.foot .opening-hours-list div { border-bottom-color: rgba(255, 255, 255, .14); }
+.foot .opening-hours-list dt { color: rgba(255, 255, 255, .62); }
+.foot .opening-hours-list dd { color: #fff; }
+.foot p { color: rgba(255, 255, 255, .7); }
+.foot p strong { color: #fff; }
+
+/* ---- Hero: layered, designed backdrop + a quiet "circuit" motif --------- */
+body::before {              /* soft electric glow behind the top of the page, full width so it has no visible edges */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 36rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 60% at 18% 18%, rgba(47, 123, 255, .13), transparent 70%),
+    radial-gradient(40% 55% at 88% 8%, rgba(242, 184, 75, .10), transparent 70%);
+}
+body { position: relative; }
+#home { position: relative; isolation: isolate; }
+h1 em, h1 .accent { font-style: italic; color: var(--royal); }
+
+.hero-visual {
+  background:
+    radial-gradient(60% 90% at 82% 0%, rgba(47, 123, 255, .55) 0%, transparent 60%),
+    radial-gradient(50% 80% at 8% 100%, rgba(26, 86, 200, .5) 0%, transparent 62%),
+    linear-gradient(160deg, #0d2250 0%, var(--midnight) 55%, var(--navy-deep) 100%);
+}
+.hero-visual::after {       /* circuit-trace line with glowing nodes (pure CSS/SVG, decorative) */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 840 320' preserveAspectRatio='xMidYMid slice' fill='none'%3E%3Cpath d='M0 220h180l40-60h140l30 40h160l50-90h120l40 50h80' stroke='%236aa4ff' stroke-opacity='.55' stroke-width='2'/%3E%3Cpath d='M0 270h260l36-34h210l44 56h290' stroke='%236aa4ff' stroke-opacity='.25' stroke-width='2'/%3E%3Ccircle cx='220' cy='160' r='6' fill='%23f2b84b'/%3E%3Ccircle cx='530' cy='200' r='6' fill='%236aa4ff'/%3E%3Ccircle cx='700' cy='110' r='6' fill='%23f2b84b'/%3E%3Ccircle cx='220' cy='160' r='16' stroke='%23f2b84b' stroke-opacity='.35'/%3E%3Ccircle cx='700' cy='110' r='16' stroke='%23f2b84b' stroke-opacity='.35'/%3E%3C/svg%3E") center / cover no-repeat;
+  opacity: .9;
+}
+
+/* ---- Cards: a thin top highlight so surfaces feel layered --------------- */
+.card, .product-card { background: linear-gradient(180deg, #fff, #fbfdff); }
+.card::before { content: none; }
+#services .num { font-family: var(--serif); font-size: .95rem; }
+.result { background: linear-gradient(160deg, #0d2250, var(--midnight)); }
+.big { font-family: var(--serif); }
+summary { font-family: var(--serif); font-weight: 600; letter-spacing: -.005em; }
+
+/* ---- Buttons: slightly softer, richer primary --------------------------- */
+.btn { font-family: var(--sans); }
+.btn-p { background: linear-gradient(180deg, #2a68d8, var(--cobalt)); border-color: var(--cobalt); }
+.btn-p:hover { background: linear-gradient(180deg, #3374e6, #0f48ad); border-color: #0f48ad; }
+.links a.btn-p:hover { background: linear-gradient(180deg, #3374e6, #0f48ad); }
+.btn:focus-visible { outline: 3px solid var(--electric); outline-offset: 3px; }
+
+/* ---- Draft banner: keep it, but make it sit comfortably ----------------- */
+.demo { font-family: var(--sans); font-size: .85rem; }
+
+/* ---- Final guard against sideways scroll -------------------------------- */
+.nav, .hero, .wrap { min-width: 0; }
+@media (max-width: 420px) {
+  .nav { padding-left: .8rem; }
+  .menu { padding: 0 .85rem; }
+}

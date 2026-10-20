@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>D.S. Electrical Admin</title>
+  <style>
+    :root { --ink:#14201f; --ink2:#4a5755; --paper:#f6f3ee; --card:#fff; --line:#ddd7cc; --accent:#c2410c; --accent-d:#9a3412; --r:18px;
+      --serif: Georgia, "Iowan Old Style", "Times New Roman", serif; --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:1rem/1.55 var(--sans); color:var(--ink); background:var(--paper); }
+    h1,h2,h3 { font-family:var(--serif); font-weight:600; margin:0; letter-spacing:-.01em; line-height:1.15; }
+    h1 { font-size:1.6rem; } h2 { font-size:1.35rem; margin-bottom:.4rem; } h3 { font-size:1.05rem; margin:1.2rem 0 .4rem; }
+    p { margin:0 0 .6rem; } a { color:var(--accent-d); }
+    :focus-visible { outline:3px solid var(--accent); outline-offset:2px; border-radius:6px; }
+    .wrap { width:min(100% - 2rem, 880px); margin:0 auto; padding:1.2rem 0 6rem; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .banner { border-radius:12px; padding:.8rem 1rem; margin-bottom:1rem; font-size:.92rem; border:1px solid var(--line); background:#fff; }
+    .banner.demo { background:#fff7ed; border-color:#fdba74; }
+    .banner.live { background:#ecfdf5; border-color:#6ee7b7; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:1.2rem; margin-bottom:1rem; }
+    label { display:block; font-weight:600; margin:.8rem 0 .25rem; font-size:.92rem; }
+    .hint { font-weight:400; color:var(--ink2); font-size:.82rem; }
+    input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], input[type=file], textarea, select {
+      width:100%; padding:.65rem .8rem; border:1.5px solid var(--line); border-radius:10px; font:inherit; color:var(--ink); background:#fff; }
+    input:focus, textarea:focus { outline:none; border-color:var(--accent); }
+    textarea { min-height:5rem; resize:vertical; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 1.1rem; border-radius:999px; font:inherit; font-weight:600;
+      border:1.5px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
+    .btn:hover { background:rgba(20,32,31,.06); }
+    .btn-p { background:var(--accent); border-color:var(--accent); color:#fff; } .btn-p:hover { background:var(--accent-d); border-color:var(--accent-d); }
+    .btn-s { min-height:36px; padding:0 .8rem; font-size:.85rem; }
+    .btn[disabled] { opacity:.5; cursor:not-allowed; }
+    .tabs { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .tabs button { min-height:42px; padding:0 1rem; border-radius:999px; border:1.5px solid var(--line); background:#fff; font:inherit; cursor:pointer; color:var(--ink); }
+    .tabs button[aria-selected="true"] { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .row { display:flex; gap:.5rem; align-items:center; margin-bottom:.5rem; flex-wrap:wrap; }
+    .row .grow { flex:1 1 180px; } .row .small { flex:0 0 110px; }
+    .row label.chk { display:inline-flex; align-items:center; gap:.4rem; margin:0; font-weight:500; }
+    .msg { margin-top:.6rem; font-size:.92rem; font-weight:500; min-height:1.2em; }
+    .msg.ok { color:#047857; } .msg.err { color:#b91c1c; } .msg.info { color:var(--ink2); }
+    .savebar { position:fixed; left:0; right:0; bottom:0; background:rgba(255,255,255,.96); border-top:1px solid var(--line); padding:.7rem 1rem; display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; z-index:10; }
+    code { background:#f1ede4; padding:.1rem .35rem; border-radius:6px; font-size:.85em; word-break:break-all; }
+    [hidden] { display:none !important; }
+  </style>
+  <link rel="stylesheet" href="premium-admin.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>D.S. Electrical Admin</h1>
+    <div class="row" style="margin:0;">
+      <a class="btn btn-s" href="index.html" target="_blank" rel="noopener">View website</a>
+      <button class="btn btn-s" id="btnSignOut" hidden>Sign out</button>
+    </div>
+  </div>
+
+  <div id="modeBanner" class="banner">Loading…</div>
+
+  <!-- LOGIN -->
+  <section id="loginView" hidden>
+    <div class="card" style="max-width:420px; margin-inline:auto;">
+      <h2>Sign in</h2>
+      <form id="loginForm" autocomplete="on">
+        <label for="loginUser" id="loginUserLabel">Email</label>
+        <input id="loginUser" type="text" autocomplete="username" required>
+        <label for="loginPass">Password</label>
+        <input id="loginPass" type="password" autocomplete="current-password" required>
+        <div class="row" style="margin-top:1rem;">
+          <button class="btn btn-p" type="submit" id="btnLogin">Sign in</button>
+          <button class="btn btn-s" type="button" id="btnForgot">Forgot password?</button>
+        </div>
+        <div id="loginMsg" class="msg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- PASSWORD RECOVERY (opened from Supabase's verified reset link) -->
+  <section id="recoverView" hidden>
+    <div class="card" style="max-width:420px; margin-inline:auto;">
+      <h2>Set a new password</h2>
+      <p class="hint">Choose a new password of at least 10 characters, then sign in again.</p>
+      <form id="recoverForm" autocomplete="off">
+        <label for="recoverPass">New password</label>
+        <input id="recoverPass" type="password" autocomplete="new-password" minlength="10" required>
+        <label for="recoverPass2">Repeat new password</label>
+        <input id="recoverPass2" type="password" autocomplete="new-password" minlength="10" required>
+        <div class="row" style="margin-top:1rem;">
+          <button class="btn btn-p" type="submit" id="btnRecover">Update password</button>
+          <button class="btn btn-s" type="button" id="btnBackToLogin">Back to sign in</button>
+        </div>
+        <div id="recoverMsg" class="msg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="appView" hidden>
+    <div class="tabs" role="tablist" aria-label="Admin sections" id="tabs">
+      <button role="tab" aria-selected="true" data-tab="business">Business</button>
+      <button role="tab" aria-selected="false" data-tab="content">Website Content</button>
+      <button role="tab" aria-selected="false" data-tab="appliances">Services</button>
+      <button role="tab" aria-selected="false" data-tab="pricing">Fee &amp; Areas</button>
+      <button role="tab" aria-selected="false" data-tab="photos">Photography</button>
+      <button role="tab" aria-selected="false" data-tab="products">Products</button>
+      <button role="tab" aria-selected="false" data-tab="enquiries">Enquiries</button>
+      <button role="tab" aria-selected="false" data-tab="account">Account &amp; Security</button>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="card" data-panel="business">
+      <h2>Business information</h2>
+      <label for="b_name">Business name</label>
+      <input id="b_name" type="text" maxlength="80" data-path="business.name">
+      <label for="b_phone">Public telephone number</label>
+      <input id="b_phone" type="text" maxlength="30" data-path="business.phone">
+      <label for="b_email">Public contact email <span class="hint">— enquiries from the website are emailed to this address</span></label>
+      <input id="b_email" type="email" maxlength="254" data-path="business.email">
+      <p class="hint" id="emailNote"></p>
+      <h3>Opening Times</h3>
+      <p class="hint">These exact hours appear in the contact section and footer. Edit the times, then save to publish them across devices. Do not enter unconfirmed bank holiday or special hours.</p>
+      <label for="b_hours_weekdays">Monday–Friday</label>
+      <input id="b_hours_weekdays" type="text" maxlength="60" data-path="business.openingHours.0.hours" required>
+      <label for="b_hours_saturday">Saturday</label>
+      <input id="b_hours_saturday" type="text" maxlength="60" data-path="business.openingHours.1.hours" required>
+      <label for="b_hours_sunday">Sunday</label>
+      <input id="b_hours_sunday" type="text" maxlength="60" data-path="business.openingHours.2.hours" required>
+      <label for="b_address">Address <span class="hint">(optional, shown in the contact section)</span></label>
+      <input id="b_address" type="text" maxlength="200" data-path="business.address">
+    </div>
+
+    <!-- CONTENT -->
+    <div class="card" data-panel="content" hidden>
+      <h2>Website content</h2>
+      <label for="c_kicker">Small heading above the headline</label>
+      <input id="c_kicker" type="text" maxlength="80" data-path="content.kicker">
+      <label for="c_headline">Hero headline</label>
+      <input id="c_headline" type="text" maxlength="140" data-path="content.headline">
+      <label for="c_intro">Supporting text</label>
+      <textarea id="c_intro" maxlength="400" data-path="content.intro"></textarea>
+      <div class="row">
+        <div class="grow"><label for="c_b1">Primary button label</label><input id="c_b1" type="text" maxlength="40" data-path="content.primaryButton"></div>
+        <div class="grow"><label for="c_b2">Secondary button label</label><input id="c_b2" type="text" maxlength="40" data-path="content.secondaryButton"></div>
+      </div>
+      <h3>Approved trust statements</h3>
+      <p class="hint">Optional. Only publish statements that are true for your business. Up to 6. None are shown by default.</p>
+      <div id="trustList"></div>
+      <button class="btn btn-s" type="button" id="addTrust">Add statement</button>
+      <h3>Sections &amp; banner</h3>
+      <div class="row"><label class="chk"><input type="checkbox" data-path="content.showSampleReviews"> Show the “Customer feedback” placeholder section <span class="hint">(contains no reviews; leave off until you have real, permissioned reviews)</span></label></div>
+      <div class="row"><label class="chk"><input type="checkbox" data-path="content.showDemoBanner"> Show the “Draft content” banner at the top</label></div>
+    </div>
+
+    <!-- APPLIANCES -->
+    <div class="card" data-panel="appliances" hidden>
+      <h2>Services</h2>
+      <p class="hint">These are the services customers choose from in step 1 of the enquiry form. Untick to hide one without deleting it. (The service cards on the page itself are fixed text in index.html.) Use the arrows to reorder.</p>
+      <div id="applianceList"></div>
+      <div class="row" style="margin-top:.8rem;">
+        <input class="grow" id="newAppliance" type="text" maxlength="60" placeholder="New service name" aria-label="New service name">
+        <button class="btn btn-s" type="button" id="addAppliance">Add service</button>
+      </div>
+      <div id="applianceMsg" class="msg err" role="alert"></div>
+    </div>
+
+    <!-- PRICING & AREAS -->
+    <div class="card" data-panel="pricing" hidden>
+      <h2>Inspection fee &amp; service areas</h2>
+      <label for="p_fee">Inspection fee <span class="hint">(optional; number only, shown as £. Leave blank to hide the fee and the pricing section)</span></label>
+      <input id="p_fee" type="text" inputmode="decimal" maxlength="10" data-path="pricing.fee" style="max-width:10rem;">
+      <label for="p_policy">Pricing policy sentence <span class="hint">— shown next to the fee in the enquiry form and pricing section</span></label>
+      <textarea id="p_policy" maxlength="300" data-path="pricing.policy"></textarea>
+      <h3>Covered service areas <span class="hint">(optional; the coverage section only appears once an area is added)</span></h3>
+      <div id="areaList"></div>
+      <button class="btn btn-s" type="button" id="addArea">Add area</button>
+    </div>
+
+    <!-- PHOTOGRAPHY -->
+    <div class="card" data-panel="photos" hidden>
+      <h2>Photography</h2>
+      <p class="hint">Use only genuine photographs of your business and work, hosted at an <code>https://</code> address you control or are licensed to use. Do not use stock photos as if they show your business. With no photos, the hero stays text-only and the gallery is hidden.</p>
+      <label for="ph_hero">Hero photo URL</label>
+      <input id="ph_hero" type="url" maxlength="500" placeholder="https://…" data-path="photos.heroUrl">
+      <label for="ph_hero_file">Or upload a hero photo <span class="hint">(JPG, PNG, WebP or AVIF, up to 5 MB; stored in your existing Supabase image bucket)</span></label>
+      <input id="ph_hero_file" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
+      <div id="heroUploadMsg" class="msg info" role="status" aria-live="polite"></div>
+      <img id="heroPreview" class="upload-preview" alt="Preview of the saved hero photo" hidden>
+      <label for="ph_alt">Hero photo description <span class="hint">(for screen readers)</span></label>
+      <input id="ph_alt" type="text" maxlength="160" data-path="photos.heroAlt">
+      <h3>Gallery photographs</h3>
+      <div id="galleryList"></div>
+      <button class="btn btn-s" type="button" id="addPhoto">Add photograph</button>
+      <div id="galleryUploadMsg" class="msg info" role="status" aria-live="polite"></div>
+      <div id="photoMsg" class="msg err" role="alert"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="card" data-panel="products" hidden>
+      <h2>Product management</h2>
+      <p class="hint">Only products you publish appear on the public website. Leave the price blank if it has not been confirmed. No sample products are created automatically.</p>
+      <form id="productForm">
+        <input id="productEditId" type="hidden">
+        <label for="productName">Product name</label>
+        <input id="productName" type="text" maxlength="120" required>
+        <label for="productDescription">Description</label>
+        <textarea id="productDescription" maxlength="2000" rows="3"></textarea>
+        <label for="productCategory">Category</label>
+        <input id="productCategory" type="text" maxlength="80">
+        <label for="productPrice">Price <span class="hint">(optional; displayed in GBP, £)</span></label>
+        <input id="productPrice" type="number" min="0" step="0.01" inputmode="decimal" style="max-width:15rem;">
+        <label for="productAvailability">Availability</label>
+        <select id="productAvailability">
+          <option value="ask" selected>Contact us to check (default)</option>
+          <option value="available">Available</option>
+          <option value="out_of_stock">Out of stock</option>
+          <option value="preorder">Pre-order</option>
+        </select>
+        <label for="productImage">Product image <span class="hint">(JPG, PNG, WebP or AVIF; maximum 5 MB)</span></label>
+        <input id="productImage" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
+        <p id="productImageCurrent" class="hint"></p>
+        <div class="row" style="margin-top:1rem;">
+          <button class="btn btn-p" id="productSaveButton" type="submit">Save product</button>
+          <button class="btn btn-s" id="productCancelButton" type="button" hidden>Cancel edit</button>
+        </div>
+        <div id="productFormMsg" class="msg" role="status" aria-live="polite"></div>
+      </form>
+      <hr style="border:0;border-top:1px solid var(--line);margin:1.4rem 0;">
+      <h3>Saved products</h3>
+      <div id="productList" aria-live="polite"></div>
+    </div>
+
+    <!-- CUSTOMER ENQUIRIES -->
+    <div class="card" data-panel="enquiries" hidden>
+      <h2>Customer enquiries</h2>
+      <p class="hint">Only the owner account can read these records. New enquiries are saved before email notification is attempted.</p>
+      <div class="row" style="margin-top:.8rem;">
+        <label for="enquiryFilter" style="margin:0;">Filter by status</label>
+        <select id="enquiryFilter" style="width:auto;min-width:12rem;">
+          <option value="all">All statuses</option><option value="new">New</option><option value="contacted">Contacted</option><option value="resolved">Resolved</option><option value="archived">Archived</option>
+        </select>
+        <button class="btn btn-s" id="refreshEnquiries" type="button">Refresh</button>
+      </div>
+      <div id="enquiryList" aria-live="polite" style="margin-top:1rem;"></div>
+      <div id="enquiryMsg" class="msg" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="card" data-panel="account" hidden>
+      <h2>Account &amp; security</h2>
+      <div id="acctDemo" class="banner demo" hidden>
+        Configure Supabase Auth and sign in with the real owner account. There is no production demo login.
+      </div>
+      <div id="acctLive" hidden>
+        <p>Signed in as: <strong id="acctEmail"></strong> <span class="hint" id="acctVerified"></span></p>
+        <p class="hint">Your account ID (used when registering the site owner in Supabase): <code id="acctUid"></code></p>
+
+        <h3>Change login email</h3>
+        <form id="emailForm" autocomplete="off">
+          <label for="newEmail">New login email</label>
+          <input id="newEmail" type="email" autocomplete="email" required>
+          <label for="emailPass">Current password <span class="hint">(to confirm it’s you)</span></label>
+          <input id="emailPass" type="password" autocomplete="current-password" required>
+          <p class="hint" style="margin-top:.5rem;">Supabase sends a verification link to the new address. This does not change the public contact email used for enquiry notifications.</p>
+          <button class="btn btn-p btn-s" type="submit">Send verification link</button>
+          <div id="emailMsg" class="msg" role="status" aria-live="polite"></div>
+        </form>
+
+        <h3>Change password</h3>
+        <form id="passForm" autocomplete="off">
+          <label for="oldPass">Current password</label>
+          <input id="oldPass" type="password" autocomplete="current-password" required>
+          <label for="newPass">New password <span class="hint">(at least 10 characters)</span></label>
+          <input id="newPass" type="password" autocomplete="new-password" minlength="10" required>
+          <label for="newPass2">Repeat new password</label>
+          <input id="newPass2" type="password" autocomplete="new-password" minlength="10" required>
+          <div style="margin-top:.8rem;"><button class="btn btn-p btn-s" type="submit">Change password</button></div>
+          <div id="passMsg" class="msg" role="status" aria-live="polite"></div>
+        </form>
+
+        <h3>Forgot your password?</h3>
+        <button class="btn btn-s" type="button" id="btnReset">Email me a password-reset link</button>
+        <div id="resetMsg" class="msg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="savebar" id="saveBar">
+      <span id="saveState" class="hint" aria-live="polite"></span>
+      <button class="btn btn-p" id="btnSave" type="button">Save changes</button>
+    </div>
+    <div id="saveMsg" class="msg" role="status" aria-live="polite" style="text-align:center; margin-bottom:3rem;"></div>
+  </section>
+</div>
+
+<script src="site-defaults.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script type="module">
+const Cfg = window.SiteCfg;
+const $ = id => document.getElementById(id);
+const SUP = window.SUPABASE_CONFIG || {};
+let sb = null, cfg = Cfg.normalize(null), currentUser = null, dirty = false;
+let products = [], enquiries = [], editingImageUrl = '';
+let activeUserId = '';
+let recoveryRequested = false;
+
+const say = (el, text, kind) => { el.textContent = text || ''; el.className = 'msg ' + (kind || 'info'); };
+const getPath = (o, p) => p.split('.').reduce((a, k) => a == null ? a : a[k], o);
+const setPath = (o, p, v) => { const ks = p.split('.'); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; };
+function markDirty() { dirty = true; $('saveState').textContent = 'Unsaved changes'; }
+function authError(e) {
+  const m = (e && e.message) || '';
+  if (/invalid login credentials/i.test(m)) return 'Email or password is incorrect.';
+  if (/email not confirmed/i.test(m)) return 'Verify your email address using the link from Supabase, then sign in.';
+  if (/rate limit|too many requests/i.test(m)) return 'Too many attempts. Please wait a few minutes and try again.';
+  if (/password/i.test(m) && /weak|short|length/i.test(m)) return 'Use a stronger password with at least 10 characters.';
+  if (/multiple \(or no\) rows/i.test(m)) return 'Owner setup is incomplete: the site_settings row was not found. Run supabase/schema.sql, then insert the owner row (README section 2, step 4).';
+  if (/invalid api key|apikey/i.test(m)) return 'Supabase rejected the public key in supabase-config.js. Use the project\'s publishable (anon) key.';
+  if (/failed to fetch|networkerror|load failed|network request failed|fetch/i.test(m)) {
+    let host = ''; try { host = new URL(SUP.url).host; } catch (_) {}
+    return 'Could not reach Supabase' + (host ? ' at ' + host : '') + '. Check the url in supabase-config.js is your project URL and that the project is not paused, then check your connection.';
+  }
+  if (/network/i.test(m)) return 'Network problem. Check your connection and try again.';
+  return m || 'Something went wrong. Please try again.';
+}
+function mkInput(value, ph, max, onInput, cls, label) {
+  const i = document.createElement('input'); i.type = 'text'; i.value = value; i.placeholder = ph || ''; i.maxLength = max;
+  i.className = cls || 'grow'; i.setAttribute('aria-label', label || ph || 'value');
+  i.addEventListener('input', () => { onInput(i.value); markDirty(); }); return i;
+}
+function mkBtn(text, label, fn) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-s'; b.textContent = text; b.setAttribute('aria-label', label); b.addEventListener('click', fn); return b;
+}
+function renderTrust() {
+  const box = $('trustList'); box.innerHTML = '';
+  cfg.content.trust.forEach((t, i) => {
+    const r = document.createElement('div'); r.className = 'row';
+    r.append(mkInput(t.num, 'Big text (e.g. 90)', 12, v => t.num = v, 'small', 'Big text'),
+      mkInput(t.title, 'Title', 60, v => t.title = v, 'grow', 'Title'),
+      mkInput(t.text, 'Description', 200, v => t.text = v, 'grow', 'Description'),
+      mkBtn('Remove', 'Remove statement ' + (i + 1), () => { cfg.content.trust.splice(i, 1); markDirty(); renderTrust(); }));
+    box.append(r);
+  });
+  $('addTrust').disabled = cfg.content.trust.length >= 6;
+}
+function renderAppliances() {
+  const box = $('applianceList'); box.innerHTML = '';
+  cfg.appliances.forEach((a, i) => {
+    const r = document.createElement('div'); r.className = 'row';
+    const lab = document.createElement('label'); lab.className = 'chk';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = a.enabled; cb.setAttribute('aria-label', 'Show ' + a.label);
+    cb.addEventListener('change', () => { a.enabled = cb.checked; markDirty(); }); lab.append(cb, document.createTextNode('Shown'));
+    const up = mkBtn('↑', 'Move ' + a.label + ' up', () => { if (i > 0) { [cfg.appliances[i - 1], cfg.appliances[i]] = [cfg.appliances[i], cfg.appliances[i - 1]]; markDirty(); renderAppliances(); } });
+    const dn = mkBtn('↓', 'Move ' + a.label + ' down', () => { if (i < cfg.appliances.length - 1) { [cfg.appliances[i + 1], cfg.appliances[i]] = [cfg.appliances[i], cfg.appliances[i + 1]]; markDirty(); renderAppliances(); } });
+    up.disabled = i === 0; dn.disabled = i === cfg.appliances.length - 1;
+    r.append(mkInput(a.label, 'Category name', 60, v => a.label = v, 'grow', 'Category name'), lab, up, dn,
+      mkBtn('Remove', 'Remove ' + a.label, () => { cfg.appliances.splice(i, 1); markDirty(); renderAppliances(); })); box.append(r);
+  });
+}
+function renderAreas() {
+  const box = $('areaList'); box.innerHTML = '';
+  cfg.areas.forEach((a, i) => {
+    const r = document.createElement('div'); r.className = 'row';
+    r.append(mkInput(a.name, 'Area or district name', 80, v => a.name = v, 'grow', 'Area name'),
+      mkInput(a.zip, 'Postal code', 12, v => a.zip = v, 'small', 'Postal code'),
+      mkBtn('Remove', 'Remove ' + a.name, () => { cfg.areas.splice(i, 1); markDirty(); renderAreas(); })); box.append(r);
+  });
+}
+function renderGallery() {
+  const box = $('galleryList'); box.innerHTML = '';
+  cfg.photos.gallery.forEach((g, i) => {
+    const r = document.createElement('div'); r.className = 'row';
+    if (g.url) { const th = document.createElement('img'); th.src = g.url; th.alt = ''; th.className = 'upload-thumb'; th.onerror = () => th.remove(); r.append(th); }
+    const up = document.createElement('input'); up.type = 'file'; up.accept = 'image/jpeg,image/png,image/webp,image/avif'; up.setAttribute('aria-label', 'Upload photo ' + (i + 1)); up.className = 'grow';
+    up.addEventListener('change', async () => {
+      const f = up.files && up.files[0]; if (!f) return;
+      try { say($('galleryUploadMsg'), 'Uploading…', 'info'); g.url = await uploadSiteImage(f); markDirty(); renderGallery(); say($('galleryUploadMsg'), 'Uploaded. Press “Save changes” to publish it.', 'ok'); }
+      catch (err) { say($('galleryUploadMsg'), 'Upload failed: ' + authError(err), 'err'); }
+    });
+    r.append(mkInput(g.url, 'https://… photo address', 500, v => g.url = v, 'grow', 'Photo address'), up,
+      mkInput(g.caption, 'Caption (describe what the photo really shows)', 140, v => g.caption = v, 'grow', 'Photo caption'),
+      mkBtn('Remove', 'Remove photo ' + (i + 1), () => { cfg.photos.gallery.splice(i, 1); markDirty(); renderGallery(); })); box.append(r);
+  });
+  $('addPhoto').disabled = cfg.photos.gallery.length >= 12;
+}
+function bindAll() {
+  document.querySelectorAll('[data-path]').forEach(el => {
+    const v = getPath(cfg, el.dataset.path);
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v == null ? '' : v;
+  });
+  renderTrust(); renderAppliances(); renderAreas(); renderGallery(); showHeroPreview();
+}
+document.querySelectorAll('[data-path]').forEach(el => {
+  const h = () => { setPath(cfg, el.dataset.path, el.type === 'checkbox' ? el.checked : el.value); markDirty(); };
+  el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', h);
+});
+$('addTrust').onclick = () => { cfg.content.trust.push({ num: '', title: '', text: '' }); markDirty(); renderTrust(); };
+$('addArea').onclick = () => { cfg.areas.push({ name: '', zip: '' }); markDirty(); renderAreas(); };
+/* Hero / gallery image upload. Reuses the existing owner-only "product-images" bucket and its policies (no schema change);
+   the public URL is placed in the same config field the URL box edits, and is published when "Save changes" is pressed. */
+async function uploadSiteImage(file) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+  if (!currentUser || !sb) throw new Error('Please sign in first.');
+  if (!allowed.includes(file.type) || file.size > 5 * 1024 * 1024) throw new Error('Choose a JPG, PNG, WebP or AVIF image no larger than 5 MB.');
+  const path = currentUser.id + '/site/' + crypto.randomUUID() + '-' + safeFilename(file.name);
+  const { error } = await sb.storage.from('product-images').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+  if (error) throw error;
+  return sb.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+}
+function showHeroPreview() {
+  const img = $('heroPreview'), url = cfg.photos.heroUrl;
+  if (!url) { img.hidden = true; img.removeAttribute('src'); return; }
+  img.onerror = () => { img.hidden = true; }; img.onload = () => { img.hidden = false; }; img.src = url;
+}
+$('ph_hero_file').addEventListener('change', async () => {
+  const f = $('ph_hero_file').files && $('ph_hero_file').files[0]; if (!f) return;
+  try {
+    say($('heroUploadMsg'), 'Uploading…', 'info');
+    cfg.photos.heroUrl = await uploadSiteImage(f); $('ph_hero').value = cfg.photos.heroUrl; markDirty(); showHeroPreview();
+    say($('heroUploadMsg'), 'Uploaded. Press “Save changes” to publish it.', 'ok');
+  } catch (err) { say($('heroUploadMsg'), 'Upload failed: ' + authError(err), 'err'); }
+  $('ph_hero_file').value = '';
+});
+$('ph_hero').addEventListener('change', showHeroPreview);
+$('addPhoto').onclick = () => { cfg.photos.gallery.push({ url: '', caption: '' }); markDirty(); renderGallery(); };
+$('addAppliance').onclick = () => {
+  const name = $('newAppliance').value.trim(); if (!name) return;
+  cfg.appliances.push({ id: Cfg.slug(name) + '-' + Math.random().toString(36).slice(2, 6), label: name, enabled: true });
+  $('newAppliance').value = ''; markDirty(); renderAppliances();
+};
+
+$('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]'); if (!b) return;
+  document.querySelectorAll('#tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('[data-panel]').forEach(panel => panel.hidden = panel.dataset.panel !== b.dataset.tab);
+  $('saveBar').hidden = !['business', 'content', 'appliances', 'pricing', 'photos'].includes(b.dataset.tab);
+  if (b.dataset.tab === 'products') loadProducts();
+  if (b.dataset.tab === 'enquiries') loadEnquiries();
+});
+
+function checkBeforeSave() {
+  const EMAIL = /^[^\s@<>"',;:()\[\]\\]+@[^\s@<>"',;:()\[\]\\]+\.[^\s@<>"',;:()\[\]\\]{2,}$/;
+  if (!cfg.business.name.trim()) return 'Business name cannot be empty.';
+  if (cfg.business.email.trim() && !EMAIL.test(cfg.business.email.trim())) return 'Please enter a valid public contact email.';
+  if (cfg.business.phone && cfg.business.phone.length > 30) return 'Phone number is too long.';
+  if (!cfg.appliances.some(a => a.enabled && a.label.trim())) return 'Keep at least one service switched on.';
+  if (String(cfg.pricing.fee).trim() && !/^[0-9]+([.,][0-9]{1,2})?$/.test(String(cfg.pricing.fee).trim())) return 'The inspection fee must be a number, for example 89, or left blank.';
+    const badPhoto = [cfg.photos.heroUrl, ...cfg.photos.gallery.map(g => g.url)].find(u => u && !/^https:\/\/[^\s"'<>]+$/i.test(u));
+  if (badPhoto) return 'Photo addresses must start with https:// (' + badPhoto.slice(0, 40) + ').';
+  return '';
+}
+async function loadConfig() {
+  const { data, error } = await sb.from('site_settings').select('config,owner_id').eq('id', 1).single();
+  if (error) throw error;
+  if (!data || data.owner_id !== currentUser.id) throw new Error('This account is not registered as the owner of this website.');
+  return Cfg.normalize(data.config);
+}
+$('btnSave').onclick = async () => {
+  const problem = checkBeforeSave(); if (problem) { say($('saveMsg'), problem, 'err'); return; }
+  cfg = Cfg.normalize(cfg); const btn = $('btnSave'); btn.disabled = true; say($('saveMsg'), 'Saving…', 'info');
+  try {
+    const { data, error } = await sb.from('site_settings').update({ config: cfg }).eq('id', 1).eq('owner_id', currentUser.id).select('id').maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Supabase did not confirm that your settings were saved. Check the owner row and RLS policies.');
+    say($('saveMsg'), 'Saved and published. The public website will use these settings across devices.', 'ok');
+    dirty = false; $('saveState').textContent = 'All changes saved'; bindAll();
+  } catch (e) { say($('saveMsg'), 'Not saved: ' + authError(e) + '. Your edits are still on this page.', 'err'); }
+  finally { btn.disabled = false; }
+};
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* Products: all writes go through the authenticated Supabase client and RLS. */
+async function loadProducts() {
+  if (!sb || !currentUser) return;
+  $('productList').textContent = 'Loading products…';
+  const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
+  if (error) { $('productList').textContent = 'Could not load products: ' + authError(error); return; }
+  products = data || []; renderProductList();
+}
+function availabilityLabel(v) { return ({ available: 'Available', out_of_stock: 'Out of stock', preorder: 'Pre-order', ask: 'Contact us to check' })[v] || v; }
+function renderProductList() {
+  const box = $('productList'); box.innerHTML = '';
+  if (!products.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'No products saved yet. Add a real product above; none are created as examples.'; box.append(p); return; }
+  products.forEach(p => {
+    const card = document.createElement('article'); card.className = 'card'; card.style.marginTop = '.8rem'; card.style.padding = '1rem';
+    const row = document.createElement('div'); row.className = 'row'; row.style.alignItems = 'flex-start';
+    if (p.image_url) { const img = document.createElement('img'); img.src = p.image_url; img.alt = p.name; img.loading = 'lazy'; img.style.cssText = 'width:84px;height:84px;object-fit:cover;border-radius:10px;'; row.append(img); }
+    const info = document.createElement('div'); info.style.cssText = 'flex:1 1 200px;min-width:0;';
+    const title = document.createElement('strong'); title.textContent = p.name; info.append(title);
+    const meta = document.createElement('p'); meta.className = 'hint';
+    meta.textContent = (p.category || 'Uncategorised') + ' · ' + (p.price === null ? 'Price not set' : '£' + Number(p.price).toFixed(2)) + ' · ' + availabilityLabel(p.availability) + ' · ' + (p.published ? 'Published' : 'Unpublished'); info.append(meta);
+    if (p.description) { const desc = document.createElement('p'); desc.textContent = p.description; info.append(desc); }
+    const actions = document.createElement('div'); actions.className = 'row';
+    actions.append(mkBtn('Edit', 'Edit ' + p.name, () => editProduct(p)));
+    actions.append(mkBtn(p.published ? 'Unpublish' : 'Publish', (p.published ? 'Unpublish ' : 'Publish ') + p.name, () => toggleProduct(p)));
+    actions.append(mkBtn('Delete', 'Delete ' + p.name, () => deleteProduct(p)));
+    card.append(row); row.append(info); card.append(actions); box.append(card);
+  });
+}
+function editProduct(p) {
+  $('productEditId').value = p.id; $('productName').value = p.name; $('productDescription').value = p.description || '';
+  $('productCategory').value = p.category || ''; $('productPrice').value = p.price == null ? '' : p.price;
+  $('productAvailability').value = p.availability || 'ask'; $('productImage').value = '';
+  editingImageUrl = p.image_url || ''; $('productImageCurrent').textContent = editingImageUrl ? 'Current image is saved online. Choose a file to replace it.' : 'No current image.';
+  $('productSaveButton').textContent = 'Update product'; $('productCancelButton').hidden = false; say($('productFormMsg'), 'Editing ' + p.name + '.', 'info');
+  $('productName').focus();
+}
+function resetProductForm() {
+  $('productForm').reset(); $('productEditId').value = ''; editingImageUrl = ''; $('productImageCurrent').textContent = '';
+  $('productSaveButton').textContent = 'Save product'; $('productCancelButton').hidden = true;
+}
+$('productCancelButton').onclick = () => { resetProductForm(); say($('productFormMsg'), 'Edit cancelled.', 'info'); };
+function safeFilename(name) { return String(name || 'image').normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-80) || 'image'; }
+function storagePathFromUrl(url) {
+  if (!url) return '';
+  const marker = '/storage/v1/object/public/product-images/'; const i = url.indexOf(marker);
+  return i >= 0 ? decodeURIComponent(url.slice(i + marker.length)) : '';
+}
+$('productForm').addEventListener('submit', async e => {
+  e.preventDefault(); if (!currentUser) return;
+  const name = $('productName').value.trim();
+  const priceText = $('productPrice').value.trim();
+  if (!name) { say($('productFormMsg'), 'Enter a product name.', 'err'); return; }
+  if (priceText && (!Number.isFinite(Number(priceText)) || Number(priceText) < 0)) { say($('productFormMsg'), 'Price must be a non-negative number.', 'err'); return; }
+  const file = $('productImage').files && $('productImage').files[0];
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+  if (file && (!allowed.includes(file.type) || file.size > 5 * 1024 * 1024)) { say($('productFormMsg'), 'Choose a JPG, PNG, WebP or AVIF image no larger than 5 MB.', 'err'); return; }
+  const btn = $('productSaveButton'); btn.disabled = true; say($('productFormMsg'), 'Saving product…', 'info');
+  const editId = $('productEditId').value;
+  const existing = editId ? products.find(p => p.id === editId) : null;
+  let imageUrl = editingImageUrl || (existing && existing.image_url) || '';
+  try {
+    if (file) {
+      const path = currentUser.id + '/' + crypto.randomUUID() + '-' + safeFilename(file.name);
+      const { error: uploadError } = await sb.storage.from('product-images').upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+      imageUrl = sb.storage.from('product-images').getPublicUrl(path).data.publicUrl;
+    }
+    const payload = {
+      owner_id: currentUser.id, name, description: $('productDescription').value.trim(), category: $('productCategory').value.trim(),
+      price: priceText === '' ? null : Number(priceText), availability: $('productAvailability').value, image_url: imageUrl
+    };
+    let result;
+    if (editId) result = await sb.from('products').update(payload).eq('id', editId).eq('owner_id', currentUser.id).select('*').single();
+    else result = await sb.from('products').insert(payload).select('*').single();
+    if (result.error) throw result.error;
+    if (file && existing && existing.image_url && existing.image_url !== imageUrl) {
+      const oldPath = storagePathFromUrl(existing.image_url); if (oldPath) await sb.storage.from('product-images').remove([oldPath]);
+    }
+    say($('productFormMsg'), editId ? 'Product updated.' : 'Product saved as unpublished. Publish it when ready.', 'ok');
+    resetProductForm(); await loadProducts();
+  } catch (err) { say($('productFormMsg'), 'Product not saved: ' + authError(err), 'err'); }
+  finally { btn.disabled = false; }
+});
+async function toggleProduct(p) {
+  const { error } = await sb.from('products').update({ published: !p.published }).eq('id', p.id).eq('owner_id', currentUser.id);
+  if (error) say($('productFormMsg'), 'Could not change publication: ' + authError(error), 'err'); else { say($('productFormMsg'), p.published ? 'Product unpublished.' : 'Product published.', 'ok'); await loadProducts(); }
+}
+async function deleteProduct(p) {
+  if (!confirm('Delete "' + p.name + '"? This cannot be undone.')) return;
+  const { error } = await sb.from('products').delete().eq('id', p.id).eq('owner_id', currentUser.id);
+  if (error) { say($('productFormMsg'), 'Could not delete product: ' + authError(error), 'err'); return; }
+  const path = storagePathFromUrl(p.image_url); if (path) await sb.storage.from('product-images').remove([path]);
+  say($('productFormMsg'), 'Product deleted.', 'ok'); await loadProducts();
+}
+
+/* Enquiries: private rows are protected by RLS and only returned to the signed-in owner. */
+async function loadEnquiries() {
+  if (!sb || !currentUser) return;
+  $('enquiryList').textContent = 'Loading enquiries…';
+  const { data, error } = await sb.from('enquiries').select('*').order('created_at', { ascending: false }).limit(200);
+  if (error) { $('enquiryList').textContent = 'Could not load enquiries: ' + authError(error); return; }
+  enquiries = data || []; renderEnquiries();
+}
+function renderEnquiries() {
+  const box = $('enquiryList'); box.innerHTML = '';
+  const filter = $('enquiryFilter').value;
+  const rows = enquiries.filter(e => filter === 'all' || e.status === filter);
+  if (!rows.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = enquiries.length ? 'No enquiries match this status.' : 'No customer enquiries have been saved yet.'; box.append(p); return; }
+  rows.forEach(e => {
+    const card = document.createElement('article'); card.className = 'card'; card.style.cssText = 'margin:.75rem 0;padding:1rem;';
+    const h = document.createElement('h3'); h.textContent = (e.enquiry_type === 'product' ? 'Product enquiry: ' + (e.product_name || 'Product') : 'Service enquiry: ' + (e.appliance || 'Service')) + ' · ' + (e.customer_name || 'Customer'); card.append(h);
+    const meta = document.createElement('p'); meta.className = 'hint';
+    meta.textContent = new Date(e.created_at).toLocaleString() + ' · Email notification: ' + (e.email_status || 'unknown'); card.append(meta);
+    const details = document.createElement('p');
+    details.textContent = 'Phone: ' + (e.phone || '—') + ' · Email: ' + (e.email || '—') + ' · Preferred contact: ' + (e.contact_method || '—'); card.append(details);
+    if (e.enquiry_type === 'product') {
+      const product = document.createElement('p'); product.textContent = 'Product: ' + (e.product_name || '—'); card.append(product);
+      const note = document.createElement('p'); note.textContent = 'Message: ' + (e.notes || '—'); card.append(note);
+    } else {
+      const issue = document.createElement('p'); issue.textContent = 'Property: ' + (e.brand || '—') + ' · Details: ' + (e.symptom || '—') + ' · Area: ' + (e.area || '—'); card.append(issue);
+      if (e.notes) { const note = document.createElement('p'); note.textContent = 'Notes: ' + e.notes; card.append(note); }
+    }
+    const row = document.createElement('div'); row.className = 'row'; row.style.marginTop = '.8rem';
+    const lab = document.createElement('label'); lab.style.margin = '0'; lab.textContent = 'Status';
+    const select = document.createElement('select'); select.style.width = 'auto'; select.setAttribute('aria-label', 'Status for enquiry ' + e.id);
+    [['new','New'],['contacted','Contacted'],['resolved','Resolved'],['archived','Archived']].forEach(([v, text]) => { const o = document.createElement('option'); o.value = v; o.textContent = text; select.append(o); }); select.value = e.status;
+    const save = mkBtn('Save status', 'Save status for enquiry ' + e.id, async () => {
+      save.disabled = true; const { error } = await sb.from('enquiries').update({ status: select.value }).eq('id', e.id).eq('owner_id', currentUser.id);
+      if (error) say($('enquiryMsg'), 'Status not saved: ' + authError(error), 'err');
+      else { e.status = select.value; say($('enquiryMsg'), 'Enquiry status updated.', 'ok'); renderEnquiries(); }
+      save.disabled = false;
+    });
+    row.append(lab, select, save); card.append(row); box.append(card);
+  });
+}
+$('enquiryFilter').addEventListener('change', renderEnquiries);
+$('refreshEnquiries').addEventListener('click', loadEnquiries);
+
+/* Authentication and account management. No local/demo credential can unlock the dashboard. */
+function showPasswordRecovery() {
+  activeUserId = ''; currentUser = null;
+  $('appView').hidden = true; $('btnSignOut').hidden = true; $('loginView').hidden = true; $('recoverView').hidden = false;
+  $('recoverPass').value = ''; $('recoverPass2').value = ''; say($('recoverMsg'), '');
+  $('recoverPass').focus();
+}
+function showLogin(message, kind) {
+  activeUserId = ''; currentUser = null; $('appView').hidden = true; $('btnSignOut').hidden = true; $('recoverView').hidden = true; $('loginView').hidden = false;
+  if (message) say($('loginMsg'), message, kind || 'err');
+}
+async function showApp(user) {
+  if (!user) return false;
+  if (activeUserId === user.id && !$('appView').hidden) return true;
+  currentUser = user; activeUserId = user.id;
+  try {
+    const loaded = await loadConfig();
+    cfg = loaded; bindAll(); dirty = false; $('saveState').textContent = '';
+    $('loginView').hidden = true; $('appView').hidden = false; $('btnSignOut').hidden = false;
+    $('acctDemo').hidden = true; $('acctLive').hidden = false;
+    $('acctEmail').textContent = user.email || ''; $('acctUid').textContent = user.id;
+    $('acctVerified').textContent = user.email_confirmed_at ? '(verified)' : '(verification status managed by Supabase)';
+    $('emailNote').textContent = 'Saved settings are public website content. The server reads the saved contact email; the browser cannot choose the notification recipient.';
+    $('modeBanner').className = 'banner live'; $('modeBanner').textContent = 'Connected to Supabase. Changes saved here are published to the public website.';
+    await Promise.all([loadProducts(), loadEnquiries()]);
+    return true;
+  } catch (e) {
+    activeUserId = ''; currentUser = null;
+    $('modeBanner').className = 'banner demo'; $('modeBanner').textContent = 'Owner setup is incomplete. Follow the Supabase schema and owner registration steps in README.md.';
+    showLogin(authError(e), 'err');
+    return false;
+  }
+}
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault(); if (!sb) { say($('loginMsg'), 'Supabase is not configured. Fill in supabase-config.js first.', 'err'); return; }
+  say($('loginMsg'), 'Signing in…', 'info'); $('btnLogin').disabled = true;
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('loginUser').value.trim(), password: $('loginPass').value });
+    if (error) throw error; $('loginPass').value = '';
+    /* only clear the message if the dashboard really opened; otherwise keep the reason (e.g. not the registered owner) visible */
+    if (!data.user || await showApp(data.user)) say($('loginMsg'), '');
+  } catch (err) { say($('loginMsg'), authError(err), 'err'); }
+  finally { $('btnLogin').disabled = false; }
+});
+$('btnForgot').onclick = async () => {
+  const em = $('loginUser').value.trim(); if (!em) { say($('loginMsg'), 'Type your email above first.', 'err'); return; }
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(em, { redirectTo: window.location.origin + '/admin.html' }); if (error) throw error;
+    say($('loginMsg'), 'If that email has an account, a password-reset link is on its way. Check your inbox and spam folder.', 'ok');
+  } catch (err) { say($('loginMsg'), authError(err), 'err'); }
+};
+$('btnSignOut').onclick = async () => { if (sb) await sb.auth.signOut(); showLogin('Signed out.', 'info'); };
+const reauthenticate = async password => {
+  const { error } = await sb.auth.signInWithPassword({ email: currentUser.email, password }); if (error) throw error;
+};
+$('emailForm').addEventListener('submit', async e => {
+  e.preventDefault(); const m = $('emailMsg'); say(m, 'Working…', 'info');
+  try {
+    await reauthenticate($('emailPass').value);
+    const { error } = await sb.auth.updateUser({ email: $('newEmail').value.trim() }); if (error) throw error;
+    $('emailPass').value = ''; say(m, 'Verification instructions have been sent if email changes are enabled in your Supabase Auth settings. Check the new address.', 'ok');
+  } catch (err) { say(m, authError(err), 'err'); }
+});
+$('passForm').addEventListener('submit', async e => {
+  e.preventDefault(); const m = $('passMsg');
+  if ($('newPass').value !== $('newPass2').value) { say(m, 'The new passwords do not match.', 'err'); return; }
+  if ($('newPass').value.length < 10) { say(m, 'Use at least 10 characters.', 'err'); return; }
+  say(m, 'Working…', 'info');
+  try {
+    await reauthenticate($('oldPass').value);
+    const { error } = await sb.auth.updateUser({ password: $('newPass').value }); if (error) throw error;
+    ['oldPass','newPass','newPass2'].forEach(id => $(id).value = ''); say(m, 'Password changed.', 'ok');
+  } catch (err) { say(m, authError(err), 'err'); }
+});
+$('btnReset').onclick = async () => {
+  const m = $('resetMsg');
+  try { const { error } = await sb.auth.resetPasswordForEmail(currentUser.email, { redirectTo: window.location.origin + '/admin.html' }); if (error) throw error; say(m, 'Password-reset link requested. Check your inbox and spam folder.', 'ok'); }
+  catch (err) { say(m, authError(err), 'err'); }
+};
+$('btnBackToLogin').onclick = async () => { recoveryRequested = false; try { if (sb) await sb.auth.signOut(); } catch (_) {} showLogin('Request a fresh password-reset link if the previous link expired.', 'info'); };
+$('recoverForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pass = $('recoverPass').value, confirmPass = $('recoverPass2').value, btn = $('btnRecover');
+  if (pass.length < 10) { say($('recoverMsg'), 'Use at least 10 characters.', 'err'); return; }
+  if (pass !== confirmPass) { say($('recoverMsg'), 'The passwords do not match.', 'err'); return; }
+  btn.disabled = true; say($('recoverMsg'), 'Updating password…', 'info');
+  try {
+    const { error } = await sb.auth.updateUser({ password: pass }); if (error) throw error;
+    recoveryRequested = false;
+    await sb.auth.signOut();
+    $('recoverView').hidden = true;
+    showLogin('Password updated. Sign in with your new password.', 'ok');
+  } catch (err) { say($('recoverMsg'), authError(err), 'err'); }
+  finally { btn.disabled = false; }
+});
+
+/* Says exactly what is wrong with the browser-side Supabase settings. Never prints key values. */
+function configProblem() {
+  const url = String(SUP.url || '').trim(), key = String(SUP.anonKey || '').trim();
+  if (!url && !key) return 'Supabase is not configured: both url and anonKey are empty in supabase-config.js. Add your project URL (https://<project-ref>.supabase.co) and publishable/anon key, then redeploy. See README.md section 2.';
+  if (!url) return 'supabase-config.js has no url. Add your Supabase project URL (https://<project-ref>.supabase.co).';
+  let parsed; try { parsed = new URL(url); } catch (_) { parsed = null; }
+  if (!parsed || parsed.protocol !== 'https:') return 'The url in supabase-config.js is not a valid https:// address. It should look like https://<project-ref>.supabase.co (no spaces, no trailing path).';
+  if (/your-project|project-ref|example/i.test(parsed.host)) return 'The url in supabase-config.js is still the placeholder. Replace it with your real project URL from Supabase > Project Settings > API.';
+  if (!key) return 'supabase-config.js has no anonKey. Add the publishable (sb_publishable_...) or anon key. Never use the secret/service_role key here.';
+  if (/^sb_secret_/i.test(key)) return 'The key in supabase-config.js is a SECRET key. Remove it now and use the publishable/anon key instead; secret keys must never be in browser files. Rotate that secret key in Supabase.';
+  try { const part = key.split('.')[1]; if (part && JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))).role === 'service_role') return 'The key in supabase-config.js is a service_role key. Remove it now and use the anon/publishable key; rotate the service_role key in Supabase.'; } catch (_) {}
+  if (!window.supabase) return 'The Supabase library did not load (cdn.jsdelivr.net may be blocked by an ad-blocker, firewall or offline network). Reload, or try another network.';
+  return '';
+}
+
+async function init() {
+  // Capture the recovery link before Supabase processes/removes its URL fragment.
+  recoveryRequested = /(?:^|[&#?])type=recovery(?:&|$)/i.test(window.location.hash + window.location.search);
+  const problem = configProblem();
+  if (problem) {
+    $('modeBanner').className = 'banner demo';
+    $('modeBanner').textContent = problem + ' No demo login is available.';
+    $('loginView').hidden = false; $('btnLogin').disabled = true; $('btnForgot').disabled = true;
+    return;
+  }
+  try {
+    sb = window.supabase.createClient(SUP.url, SUP.anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+  } catch (err) {
+    $('modeBanner').className = 'banner demo'; $('modeBanner').textContent = 'Supabase client could not start: ' + ((err && err.message) || 'unknown error') + '. Check supabase-config.js.';
+    $('loginView').hidden = false; $('btnLogin').disabled = true; $('btnForgot').disabled = true;
+    return;
+  }
+  $('modeBanner').className = 'banner'; $('modeBanner').textContent = 'Connecting to Supabase…';
+  // Register before getSession so the PASSWORD_RECOVERY event is not missed.
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') { recoveryRequested = true; showPasswordRecovery(); return; }
+    if (event === 'SIGNED_OUT' || !session) { if (!recoveryRequested) showLogin(); return; }
+    if (session.user && !recoveryRequested) queueMicrotask(() => showApp(session.user));
+  });
+  const { data, error } = await sb.auth.getSession();
+  if (error) { $('modeBanner').textContent = 'Supabase sign-in could not be initialized: ' + authError(error); showLogin(); return; }
+  if (recoveryRequested) showPasswordRecovery();
+  else if (data.session && data.session.user) await showApp(data.session.user);
+  else showLogin();
+}
+init();
+</script>
+</body>
+</html>

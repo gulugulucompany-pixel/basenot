@@ -1,0 +1,171 @@
+/* ==========================================================================
+   D.S. Electrical: supplemental styling for the owner admin page
+   ADDITIVE ONLY. Loaded after the styles already inside admin.html; it only
+   re-points the existing colour tokens and refines a few controls. No
+   behaviour, markup or Supabase logic is touched.
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --ink: #0a1a36;
+  --ink2: #4b5b73;
+  --paper: #f4f7fb;
+  --line: #d7e0ed;
+  --accent: #1a56c8;
+  --accent-d: #0b3f9e;
+  --r: 20px;
+  --serif: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ring: 0 0 0 4px rgba(47, 123, 255, .2);
+}
+body { -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-weight: 700; letter-spacing: -.02em; }
+:focus-visible { outline-color: #2f7bff; }
+
+.card { box-shadow: 0 1px 2px rgba(10, 26, 54, .05); }
+input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], input[type=file], textarea, select {
+  border-color: var(--line);
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus, select:focus { outline: none; border-color: #2f7bff; box-shadow: var(--ring); }
+
+.btn { transition: background .2s, border-color .2s, transform .2s, box-shadow .2s; }
+.btn:active { transform: scale(.98); }
+.btn:not(.btn-p) { border-color: rgba(26, 86, 200, .4); color: var(--accent-d); }
+.btn:not(.btn-p):hover { background: #eef4fc; }
+.btn-p { box-shadow: 0 1px 2px rgba(11, 63, 158, .3); }
+
+.tabs button { transition: background .2s, border-color .2s, color .2s; }
+.tabs button:hover { border-color: var(--accent); color: var(--accent-d); }
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.savebar { backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); background: rgba(255, 255, 255, .85); }
+code { background: #eef4fc; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .btn:active { transform: none; }
+}
+
+/* ==========================================================================
+   Polish pass: tabs, forms, upload areas, previews, lists, status
+   ========================================================================== */
+.wrap { padding-top: 1.75rem; }
+.top { margin-bottom: 1.25rem; }
+.banner { border-radius: 14px; }
+.card { padding: clamp(1.1rem, 3vw, 1.75rem); border-radius: var(--r); }
+.card > h2 { margin-bottom: .5rem; }
+.card > .hint { max-width: 70ch; margin-bottom: .9rem; }
+label { margin-top: 1.1rem; }
+
+/* tabs: horizontally scrollable pill row on narrow screens instead of wrapping into rows */
+.tabs button { white-space: nowrap; }
+@media (max-width: 700px) {
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: .25rem; margin-inline: -1rem; padding-inline: 1rem; }
+  .tabs::-webkit-scrollbar { display: none; }
+}
+
+/* buttons: same feel as the public site */
+.btn { position: relative; transition-duration: .18s; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.97); transition-duration: .08s; }
+.btn-p:hover { box-shadow: 0 8px 18px -8px rgba(11, 63, 158, .55); }
+.btn[disabled] { cursor: progress; transform: none; box-shadow: none; }
+
+/* upload areas: tidy file pickers + image previews */
+input[type=file] {
+  padding: .55rem;
+  border-style: dashed;
+  border-color: #b4c9e8;
+  background: #f8fbff;
+  cursor: pointer;
+}
+input[type=file]:hover { border-color: var(--accent); background: #eef4fc; }
+input[type=file]::file-selector-button {
+  margin-right: .8rem;
+  padding: .5rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, transform .18s;
+}
+input[type=file]::file-selector-button:hover { background: var(--accent-d); }
+.upload-preview { display: block; max-width: 100%; max-height: 220px; margin-top: .75rem; border-radius: 14px; border: 1px solid var(--line); object-fit: cover; box-shadow: 0 1px 2px rgba(10, 26, 54, .06); }
+.upload-thumb { width: 56px; height: 56px; flex: 0 0 56px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+#galleryList .row { padding: .6rem; margin-bottom: .6rem; border: 1px solid var(--line); border-radius: 14px; background: #fbfcfe; align-items: center; }
+#galleryList .row .grow { flex: 1 1 200px; min-width: 0; }
+
+/* messages: readable status chips */
+.msg:not(:empty) { padding: .55rem .8rem; border-radius: 10px; }
+.msg.ok:not(:empty) { background: #ecfdf5; }
+.msg.err:not(:empty) { background: #fef2f2; }
+.msg.info:not(:empty) { background: #eef4fc; color: var(--accent-d); }
+
+/* products and enquiries: consistent list cards */
+article.card { transition: box-shadow .2s, border-color .2s; }
+article.card:hover { border-color: #b4c9e8; box-shadow: 0 10px 26px -14px rgba(11, 63, 158, .3); }
+article.card h3 { margin-top: 0; font-size: 1.05rem; }
+article.card img { border: 1px solid var(--line); }
+#enquiryFilter, #productAvailability, article.card select { max-width: 100%; }
+article.card select { border-radius: 999px; padding: .45rem .9rem; font-weight: 600; background: #eef4fc; border-color: #b4c9e8; color: var(--accent-d); }
+
+.savebar { box-shadow: 0 -8px 24px -16px rgba(10, 26, 54, .35); }
+#saveState { color: var(--ink2); font-weight: 500; }
+@media (max-width: 560px) {
+  .row .small { flex: 1 1 100%; }
+  .btn-s { min-height: 44px; padding: 0 1rem; }
+  .savebar .btn { width: 100%; }
+}
+html, body { max-width: 100%; overflow-x: hidden; }
+@media (prefers-reduced-motion: reduce) { .btn:hover, .btn:active { transform: none; } }
+
+
+/* ==========================================================================
+   Brand + typography (matches the public site)
+   ========================================================================== */
+:root {
+  --serif: "Fraunces", "Iowan Old Style", "Charter", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+h1, h2, h3 { font-family: var(--serif); font-optical-sizing: auto; font-weight: 600; }
+body {
+  background:
+    radial-gradient(60% 40rem at 100% -10%, rgba(47, 123, 255, .10), transparent 70%),
+    radial-gradient(50% 30rem at -10% 0%, rgba(26, 86, 200, .07), transparent 70%),
+    var(--paper);
+  background-attachment: fixed;
+}
+.top h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  font-size: clamp(1.35rem, 4.5vw, 1.8rem);
+  letter-spacing: .005em;
+  word-spacing: .16em;
+}
+.top h1::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 11px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.35' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8a6.3 6.3 0 0 0-3.7 11.4c.7.5 1.1 1.3 1.1 2.1v.5h5.2v-.5c0-.8.4-1.6 1.1-2.1A6.3 6.3 0 0 0 12 2.8z'/%3E%3Cpath d='M9.6 18.4h4.8M10 20.2h4M10.7 22h2.6'/%3E%3Cpath d='M10.2 12.6 11 10.4c.3-.7 1.3-.7 1.6 0l.4 1c.2.5.9.5 1.1 0l.3-.9M11 10.4V16m2.1-5.6V16'/%3E%3C/svg%3E") center / 76% no-repeat,
+    linear-gradient(145deg, #1a56c8, #0a1a36);
+  box-shadow: 0 6px 14px -6px rgba(11, 63, 158, .7), inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+.card { background: linear-gradient(180deg, #fff, #fbfdff); }
+.btn-p { background: linear-gradient(180deg, #2a68d8, #0b3f9e); border-color: #0b3f9e; }
+.btn-p:hover { background: linear-gradient(180deg, #3374e6, #0f48ad); border-color: #0f48ad; }
+.btn-p:active { box-shadow: 0 1px 2px rgba(11, 63, 158, .4) inset; }
+.btn:focus-visible { outline: 3px solid #2f7bff; outline-offset: 3px; }
+.tabs button { font-family: var(--sans); font-weight: 500; }
+.tabs button[aria-selected="true"] { font-weight: 600; box-shadow: 0 6px 16px -8px rgba(11, 63, 158, .6); }
+label { font-family: var(--sans); }
+.banner.demo { background: #fff8e8; border-color: #f2d28b; }
+
+a.btn { text-decoration: none; }
